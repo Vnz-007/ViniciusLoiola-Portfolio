@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Menu, X } from "lucide-react";
 
 interface HeaderProps {
   activeSection: string;
@@ -10,7 +10,7 @@ const Header: React.FC<HeaderProps> = ({ activeSection }) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
-  
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -20,55 +20,59 @@ const Header: React.FC<HeaderProps> = ({ activeSection }) => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     }
-    
+
     return () => {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     };
   }, [isOpen]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: "smooth" });
       setIsOpen(false);
     }
   };
 
   const navLinks = [
-    { id: 'hero', label: 'Home' },
-    { id: 'about', label: 'About' },
-    { id: 'skills', label: 'Skills' },
-    { id: 'projects', label: 'Projects' },
-    { id: 'contact', label: 'Contact' }
+    { id: "hero", label: "Home" },
+    { id: "about", label: "About" },
+    { id: "skills", label: "Skills" },
+    { id: "projects", label: "Projects" },
+    { id: "contact", label: "Contact" },
   ];
 
   return (
-    <header 
+    <header
       className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'py-3 bg-dark-900/90 backdrop-blur-md' : 'py-5 bg-transparent'
+        isScrolled
+          ? "py-3 bg-dark-900/90 backdrop-blur-md"
+          : "py-5 bg-transparent"
       }`}
     >
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
-        <a 
-          href="#hero" 
+        <a
+          href="#hero"
           className="text-2xl font-bold text-white flex items-center group"
           onClick={(e) => {
             e.preventDefault();
-            scrollToSection('hero');
+            scrollToSection("hero");
           }}
         >
           <span className="text-primary-400">Port</span>
-          <span>folio<span className="text-primary-400">.</span></span>
+          <span>
+            fólio<span className="text-primary-400">.</span>
+          </span>
         </a>
 
         {/* Desktop Navigation */}
@@ -83,7 +87,9 @@ const Header: React.FC<HeaderProps> = ({ activeSection }) => {
                     scrollToSection(link.id);
                   }}
                   className={`relative py-2 text-sm font-medium transition-colors hover:text-primary-400 ${
-                    activeSection === link.id ? 'text-primary-400' : 'text-gray-300'
+                    activeSection === link.id
+                      ? "text-primary-400"
+                      : "text-gray-300"
                   }`}
                 >
                   {link.label}
@@ -97,7 +103,7 @@ const Header: React.FC<HeaderProps> = ({ activeSection }) => {
         </nav>
 
         {/* Mobile Menu Button */}
-        <button 
+        <button
           className="md:hidden text-white focus:outline-none"
           onClick={toggleMenu}
           aria-label={isOpen ? "Close menu" : "Open menu"}
@@ -107,9 +113,9 @@ const Header: React.FC<HeaderProps> = ({ activeSection }) => {
       </div>
 
       {/* Mobile Navigation */}
-      <div 
+      <div
         className={`fixed inset-0 bg-dark-900/95 backdrop-blur-md flex flex-col justify-center items-center transition-transform duration-300 ease-in-out md:hidden ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+          isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <nav>
@@ -123,7 +129,9 @@ const Header: React.FC<HeaderProps> = ({ activeSection }) => {
                     scrollToSection(link.id);
                   }}
                   className={`text-xl font-medium transition-colors ${
-                    activeSection === link.id ? 'text-primary-400' : 'text-gray-300'
+                    activeSection === link.id
+                      ? "text-primary-400"
+                      : "text-gray-300"
                   }`}
                 >
                   {link.label}

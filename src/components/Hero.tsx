@@ -50,11 +50,11 @@ const Hero: React.FC<HeroProps> = ({ scrollY }) => {
               className="text-lg text-gray-300 max-w-2xl text-center md:text-left animate-slide-up opacity-0"
               style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}
             >
-              Este Portfólio foi criado pela Bolt, para testar sua capacidade e
-              influenciar na inspiração do dev que está por trás dos panos,
-              baseado nos fundamentos de UX/UI, para uma melhor experiência do
-              usuário, além de ter um padrão dark, um modo de tema normalmente
-              usado pela maioria dos usuários.
+              Este Portfólio foi criado por Vnz-007, para testar e aprimorar
+              suas habilidades como NoCode e LowCode e ver até onde seus
+              conhecimentos e a IA podem chegar, utilizando a Bolt como IA
+              principal do projeto e baseando-se nos fundamentos de UX/UI este
+              portfólio foi criado.
             </p>
 
             <div
@@ -97,7 +97,7 @@ const Hero: React.FC<HeroProps> = ({ scrollY }) => {
               style={{ animationDelay: "1s", animationFillMode: "forwards" }}
             >
               <a
-                href="https://github.com"
+                href="https://github.com/Vnz-007"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-primary-400 transition-colors"
@@ -105,7 +105,7 @@ const Hero: React.FC<HeroProps> = ({ scrollY }) => {
                 <Github size={20} />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/vin%C3%ADcius-loiola-bb8688341"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-primary-400 transition-colors"
