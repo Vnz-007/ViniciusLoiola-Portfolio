@@ -23,15 +23,50 @@ const Projects = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { threshold: 0.1 });
 
+  const projectOrder = [
+    "portfolio",
+    "my-portifolio-nocode",
+    "spotify-clone",
+    "spotify-alura",
+    "flutter-techtastes",
+    "plataforma-de-agendamento",
+    "sistema-de-reembolso",
+    "rumble-nftwebsite",
+    "vl-convert",
+    "relogio-digital",
+    "epic-animes",
+    "devlinks-myprofile",
+    "previsao-do-tempo"
+  ];
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(
-          "https://api.github.com/users/Vnz-007/repos?sort=stars&per_page=6"
+          "https://api.github.com/users/Vnz-007/repos?per_page=100"
         );
         if (!response.ok) throw new Error("Failed to fetch projects");
-        const data = await response.json();
-        setProjects(data);
+        const data: GitHubRepo[] = await response.json();
+        
+        // Sort projects according to the specified order
+        const sortedProjects = [...data].sort((a, b) => {
+          const indexA = projectOrder.indexOf(a.name);
+          const indexB = projectOrder.indexOf(b.name);
+          
+          // If both projects are in the order list
+          if (indexA !== -1 && indexB !== -1) {
+            return indexA - indexB;
+          }
+          
+          // If only one project is in the order list
+          if (indexA !== -1) return -1;
+          if (indexB !== -1) return 1;
+          
+          // If neither project is in the order list, maintain original order
+          return 0;
+        });
+
+        setProjects(sortedProjects);
       } catch (err) {
         setError("Failed to load projects");
         console.error(err);
