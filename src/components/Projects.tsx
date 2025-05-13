@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { ArrowUpRight, Github, Star, GitFork } from "lucide-react";
-import { useInView } from "../hooks/useInView";
 
 interface GitHubRepo {
   id: number;
@@ -19,9 +18,9 @@ const Projects = () => {
   const [filter, setFilter] = useState<string>("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { threshold: 0.1 });
 
   const projectOrder = [
     "portfolio",
@@ -78,6 +77,24 @@ const Projects = () => {
     fetchProjects();
   }, []);
 
+  // Listen for navigation clicks
+  useEffect(() => {
+    const handleNavClick = () => {
+      const hash = window.location.hash;
+      if (hash === '#projects') {
+        setShowAnimation(true);
+      }
+    };
+
+    window.addEventListener('hashchange', handleNavClick);
+    // Check on initial load
+    if (window.location.hash === '#projects') {
+      setShowAnimation(true);
+    }
+
+    return () => window.removeEventListener('hashchange', handleNavClick);
+  }, []);
+
   const categories = [
     "All",
     ...new Set(projects.map((project) => project.language).filter(Boolean)),
@@ -96,15 +113,14 @@ const Projects = () => {
     index: number;
   }) => {
     const cardRef = useRef<HTMLDivElement>(null);
-    const isInView = useInView(cardRef, { threshold: 0.1, once: true });
 
     return (
       <div
         ref={cardRef}
         className={`group bg-dark-800/50 backdrop-blur-sm border border-dark-600 rounded-xl overflow-hidden transition-all duration-500 hover:border-primary-400 transform ${
-          isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          showAnimation ? "opacity-100 translate-y-0" : "opacity-100 translate-y-0"
         }`}
-        style={{ transitionDelay: `${index * 100}ms` }}
+        style={{ transitionDelay: showAnimation ? `${index * 100}ms` : '0ms' }}
       >
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
@@ -178,7 +194,7 @@ const Projects = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div
           className={`text-center max-w-3xl mx-auto mb-16 transition-all duration-700 ${
-            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            showAnimation ? "opacity-100 translate-y-0" : "opacity-100 translate-y-0"
           }`}
         >
           <div className="inline-flex items-center space-x-2 bg-dark-800/60 backdrop-blur-sm px-4 py-2 rounded-full border border-dark-600 mb-4">
@@ -203,10 +219,8 @@ const Projects = () => {
         ) : (
           <>
             <div
-              className={`flex justify-center mb-10 transition-all duration-700 delay-200 ${
-                isInView
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-10"
+              className={`flex justify-center mb-10 transition-all duration-700 ${
+                showAnimation ? "opacity-100 translate-y-0" : "opacity-100 translate-y-0"
               }`}
             >
               <div className="flex flex-wrap justify-center gap-2">
