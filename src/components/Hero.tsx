@@ -50,11 +50,13 @@ const Hero: React.FC<HeroProps> = ({ scrollY }) => {
               className="text-lg text-gray-300 max-w-2xl text-center md:text-left animate-slide-up opacity-0"
               style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}
             >
-              Este Portfólio foi criado por Vnz-007, para testar e aprimorar
-              suas habilidades como NoCode e LowCode e ver até onde seus
-              conhecimentos e a IA podem chegar, utilizando a Bolt como IA
-              principal do projeto e baseando-se nos fundamentos de UX/UI este
-              portfólio foi criado.
+              This portfolio was developed by Vnz-007 with the goal of testing
+              and enhancing skills in NoCode and LowCode approaches, pushing the
+              boundaries of knowledge in conjunction with artificial
+              intelligence. Using Bolt as the primary AI for the project and
+              grounded in UX/UI principles, the portfolio reflects a practical
+              application of user-centered design combined with intelligent
+              automation.
             </p>
 
             <div

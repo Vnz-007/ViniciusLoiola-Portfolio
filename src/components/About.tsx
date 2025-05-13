@@ -42,7 +42,7 @@ const About = () => {
             }`}
           >
             <div className="inline-flex items-center space-x-2 bg-dark-800/60 backdrop-blur-sm px-4 py-2 rounded-full border border-dark-600">
-              <span className="text-primary-400 font-medium">Sobre Mim</span>
+              <span className="text-primary-400 font-medium">About</span>
             </div>
 
             <h2 className="text-3xl md:text-4xl font-bold">
@@ -51,13 +51,15 @@ const About = () => {
             </h2>
 
             <p className="text-gray-300 leading-relaxed">
-              Minha stack: HTML | CSS | JavaScript | TypeScript | React |
-              Node.js With over 5 years of experience in web development and
-              design, I've honed my skills in creating user-centered digital
-              experiences that are both aesthetically pleasing and functionally
-              effective. I specialize in frontend development with a strong
-              emphasis on responsive design, accessibility, and performance
-              optimization.
+              I have been continuously developing and refining my technical
+              skills through a wide range of resources, including both paid and
+              free courses, official documentation, educational videos, and
+              more. I maintain a strong commitment to lifelong learning, with
+              the goal of securing a position that aligns with my professional
+              profile as a Full Stack Developer. In parallel, I have been
+              expanding my knowledge in design, with a focus on responsive
+              design and core UX/UI principles, aiming to deliver complete,
+              functional, and user-centered solutions.
             </p>
 
             <p className="text-gray-300 leading-relaxed">
@@ -70,11 +72,13 @@ const About = () => {
 
             <div className="pt-4">
               <a
-                href="#"
+                href="curriculo"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-dark-800 hover:bg-dark-700 border border-dark-600 px-5 py-3 rounded-lg transition-colors"
               >
                 <Download size={18} />
-                <span>Download Resume</span>
+                <span>Download my Resume</span>
               </a>
             </div>
           </div>

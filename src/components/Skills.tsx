@@ -71,10 +71,19 @@ const Skills = () => {
   const isInView = useInView(sectionRef, { threshold: 0.1 });
 
   const frontendSkills = [
-    { name: "React.js", level: 95, icon: "⚛️" },
-    { name: "TypeScript", level: 90, icon: "TS" },
-    { name: "HTML/CSS", level: 98, icon: "🎨" },
-    { name: "Next.js", level: 85, icon: "▲" },
+    { name: "HTML", level: 95, icon: "🔧" },
+    { name: "CSS", level: 95, icon: "🎨" },
+    { name: "JavaScript", level: 20, icon: "JS" },
+    { name: "TypeScript", level: 0, icon: "TS" },
+    { name: "React.js", level: 5, icon: "⚛️" },
+    { name: "Next.js", level: 0, icon: "▲" },
+  ];
+
+  const backendSkills = [
+    { name: "Node.js", level: 5, icon: "🟢" },
+    { name: "SQL", level: 0, icon: "🔋" },
+    { name: "GraphQL", level: 0, icon: "🛑" },
+    { name: "SEO", level: 77, icon: "🔍" },
   ];
 
   const designSkills = [
@@ -84,11 +93,27 @@ const Skills = () => {
     { name: "Animation", level: 80, icon: "✨" },
   ];
 
-  const otherSkills = [
-    { name: "Node.js", level: 75, icon: "🟢" },
-    { name: "GraphQL", level: 70, icon: "◼️" },
-    { name: "Git/GitHub", level: 85, icon: "🔄" },
-    { name: "SEO", level: 65, icon: "🔍" },
+  const toolsSkills = [
+    {
+      name: "Git/GitHub",
+      level: 83,
+      icon: "🔄",
+    },
+    {
+      name: "Vercel",
+      level: 98,
+      icon: "△",
+    },
+    {
+      name: "Netlify",
+      level: 80,
+      icon: "N",
+    },
+    {
+      name: "BoltIA",
+      level: 77,
+      icon: "B",
+    },
   ];
 
   return (
@@ -113,26 +138,32 @@ const Skills = () => {
           </h2>
 
           <p className="text-gray-300">
-            I've developed a diverse skill set through years of professional
-            experience and continuous learning. Here's a snapshot of my
-            technical capabilities.
+            I've cultivated a robust and versatile technical skill set through
+            years of hands-on experience and ongoing professional development.
+            The summary below highlights the core competencies I bring to
+            technology-driven environments.
           </p>
         </div>
 
         <div className="space-y-10">
           <SkillCategory
-            title="Frontend Development"
+            title="Front-end Development"
             skills={frontendSkills}
             baseDelay={isInView ? 200 : 0}
           />
           <SkillCategory
-            title="Design"
-            skills={designSkills}
+            title="Back-end Development"
+            skills={backendSkills}
             baseDelay={isInView ? 600 : 0}
           />
           <SkillCategory
-            title="Other Skills"
-            skills={otherSkills}
+            title="design"
+            skills={designSkills}
+            baseDelay={isInView ? 1000 : 0}
+          />
+          <SkillCategory
+            title="Tools"
+            skills={toolsSkills}
             baseDelay={isInView ? 1000 : 0}
           />
         </div>
