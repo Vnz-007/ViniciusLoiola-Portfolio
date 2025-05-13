@@ -155,7 +155,7 @@ const Projects = () => {
           </h2>
 
           <p className="text-gray-300">
-            A showcase of my open-source projects and contributions on GitHub.
+            
           </p>
         </div>
 

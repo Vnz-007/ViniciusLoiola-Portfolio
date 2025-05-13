@@ -69,9 +69,9 @@ const Header: React.FC<HeaderProps> = ({ activeSection }) => {
             scrollToSection("hero");
           }}
         >
-          <span className="text-primary-400">Port</span>
+          <span className="text-primary-400">Vinícius</span>
           <span>
-            fólio<span className="text-primary-400">.</span>
+            Loiola<span className="text-primary-400">.</span>
           </span>
         </a>
 
