@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { ArrowUpRight, Github, Star, GitFork } from "lucide-react";
-import { useInView } from "../hooks/useInView";
 
 interface GitHubRepo {
   id: number;
@@ -19,19 +18,55 @@ const Projects = () => {
   const [filter, setFilter] = useState<string>("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { threshold: 0.1 });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const projectOrder = [
+    "portfolio",
+    "my-portifolio-nocode",
+    "spotify-clone",
+    "spotify-alura",
+    "flutter-techtastes",
+    "plataforma-de-agendamento",
+    "sistema-de-reembolso",
+    "rumble-nftwebsite",
+    "vl-convert",
+    "relogio-digital",
+    "epic-animes",
+    "devlinks-myprofile",
+    "previsao-do-tempo",
+  ];
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(
-          "https://api.github.com/users/Vnz-007/repos?sort=stars&per_page=6"
+          "https://api.github.com/users/Vnz-007/repos?per_page=100"
         );
         if (!response.ok) throw new Error("Failed to fetch projects");
-        const data = await response.json();
-        setProjects(data);
+        const data: GitHubRepo[] = await response.json();
+
+        // Sort projects according to the specified order
+        const sortedProjects = [...data].sort((a, b) => {
+          const indexA = projectOrder.indexOf(a.name);
+          const indexB = projectOrder.indexOf(b.name);
+
+          // If both projects are in the order list
+          if (indexA !== -1 && indexB !== -1) {
+            return indexA - indexB;
+          }
+
+          // If only one project is in the order list
+          if (indexA !== -1) return -1;
+          if (indexB !== -1) return 1;
+
+          // If neither project is in the order list, maintain original order
+          return 0;
+        });
+
+        setProjects(sortedProjects);
       } catch (err) {
         setError("Failed to load projects");
         console.error(err);
@@ -41,6 +76,22 @@ const Projects = () => {
     };
 
     fetchProjects();
+  }, [projectOrder]);
+
+  // Listen for clicks on the Projects link in the header
+  useEffect(() => {
+    const handleProjectsClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const projectsLink = target.closest('a[href="#projects"]');
+
+      if (projectsLink) {
+        setShowAnimation(false); // Reset animation
+        setTimeout(() => setShowAnimation(true), 50); // Trigger animation after a brief delay
+      }
+    };
+
+    document.addEventListener("click", handleProjectsClick);
+    return () => document.removeEventListener("click", handleProjectsClick);
   }, []);
 
   const categories = [
@@ -61,15 +112,21 @@ const Projects = () => {
     index: number;
   }) => {
     const cardRef = useRef<HTMLDivElement>(null);
-    const isInView = useInView(cardRef, { threshold: 0.1, once: true });
 
     return (
       <div
         ref={cardRef}
         className={`group bg-dark-800/50 backdrop-blur-sm border border-dark-600 rounded-xl overflow-hidden transition-all duration-500 hover:border-primary-400 transform ${
-          isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          showAnimation
+            ? "opacity-0 translate-y-10"
+            : "opacity-100 translate-y-0"
         }`}
-        style={{ transitionDelay: `${index * 100}ms` }}
+        style={{
+          transitionDelay: showAnimation ? `${index * 100}ms` : "0ms",
+          animation: showAnimation
+            ? `slideUp 0.5s ease-out forwards ${index * 100}ms`
+            : "none",
+        }}
       >
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
@@ -143,8 +200,15 @@ const Projects = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div
           className={`text-center max-w-3xl mx-auto mb-16 transition-all duration-700 ${
-            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            showAnimation
+              ? "opacity-0 translate-y-10"
+              : "opacity-100 translate-y-0"
           }`}
+          style={{
+            animation: showAnimation
+              ? "slideUp 0.5s ease-out forwards"
+              : "none",
+          }}
         >
           <div className="inline-flex items-center space-x-2 bg-dark-800/60 backdrop-blur-sm px-4 py-2 rounded-full border border-dark-600 mb-4">
             <span className="text-primary-400 font-medium">My Projects</span>
@@ -154,9 +218,7 @@ const Projects = () => {
             Featured <span className="text-primary-400">Works</span>
           </h2>
 
-          <p className="text-gray-300">
-            
-          </p>
+          <p className="text-gray-300"></p>
         </div>
 
         {error ? (
@@ -168,11 +230,16 @@ const Projects = () => {
         ) : (
           <>
             <div
-              className={`flex justify-center mb-10 transition-all duration-700 delay-200 ${
-                isInView
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-10"
+              className={`flex justify-center mb-10 transition-all duration-700 ${
+                showAnimation
+                  ? "opacity-0 translate-y-10"
+                  : "opacity-100 translate-y-0"
               }`}
+              style={{
+                animation: showAnimation
+                  ? "slideUp 0.5s ease-out forwards 200ms"
+                  : "none",
+              }}
             >
               <div className="flex flex-wrap justify-center gap-2">
                 {categories.map((category) => (
