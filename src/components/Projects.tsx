@@ -15,14 +15,84 @@ interface GitHubRepo {
   updated_at: string;
 }
 
+interface VercelProject {
+  id: string;
+  name: string;
+  framework: string;
+  latestDeployments: Array<{
+    url: string;
+    meta: { githubCommitRef: string };
+  }>;
+}
+
+interface NetlifyProject {
+  id: string;
+  name: string;
+  url: string;
+  screenshot_url: string;
+  published_deploy: {
+    commit_ref: string;
+  };
+}
+
+interface Project {
+  id: string;
+  name: string;
+  description?: string;
+  url: string;
+  homepage?: string;
+  language?: string;
+  topics?: string[];
+  stats?: {
+    stars?: number;
+    forks?: number;
+  };
+  source: 'github' | 'vercel' | 'netlify';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 const Projects = () => {
-  const [projects, setProjects] = useState<GitHubRepo[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [filter, setFilter] = useState<string>("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
 
   const sectionRef = useRef<HTMLElement>(null);
+
+  const transformGithubProject = (repo: GitHubRepo): Project => ({
+    id: repo.id.toString(),
+    name: repo.name,
+    description: repo.description,
+    url: repo.html_url,
+    homepage: repo.homepage,
+    language: repo.language,
+    topics: repo.topics,
+    stats: {
+      stars: repo.stargazers_count,
+      forks: repo.forks_count,
+    },
+    source: 'github',
+    createdAt: repo.created_at,
+    updatedAt: repo.updated_at,
+  });
+
+  const transformVercelProject = (project: VercelProject): Project => ({
+    id: project.id,
+    name: project.name,
+    url: project.latestDeployments[0]?.url || '',
+    language: project.framework,
+    source: 'vercel',
+  });
+
+  const transformNetlifyProject = (project: NetlifyProject): Project => ({
+    id: project.id,
+    name: project.name,
+    url: project.url,
+    homepage: project.url,
+    source: 'netlify',
+  });
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -35,8 +105,26 @@ const Projects = () => {
         );
         if (!githubResponse.ok) throw new Error("Failed to fetch GitHub projects");
         const githubData: GitHubRepo[] = await githubResponse.json();
+        const githubProjects = githubData.map(transformGithubProject);
 
-        setProjects(githubData);
+        // Fetch Vercel projects
+        const vercelResponse = await fetch('/api/vercel-projects');
+        let vercelProjects: Project[] = [];
+        if (vercelResponse.ok) {
+          const vercelData: VercelProject[] = await vercelResponse.json();
+          vercelProjects = vercelData.map(transformVercelProject);
+        }
+
+        // Fetch Netlify projects
+        const netlifyResponse = await fetch('/api/netlify-projects');
+        let netlifyProjects: Project[] = [];
+        if (netlifyResponse.ok) {
+          const netlifyData: NetlifyProject[] = await netlifyResponse.json();
+          netlifyProjects = netlifyData.map(transformNetlifyProject);
+        }
+
+        // Combine all projects
+        setProjects([...githubProjects, ...vercelProjects, ...netlifyProjects]);
       } catch (err) {
         setError("Failed to load projects");
         console.error(err);
@@ -70,8 +158,12 @@ const Projects = () => {
 
   const categories = [
     "All",
+    "GitHub",
+    "Vercel",
+    "Netlify",
     ...new Set(
       projects
+        .filter(project => project.source === 'github')
         .map(project => project.language)
         .filter(Boolean)
     ),
@@ -79,9 +171,15 @@ const Projects = () => {
 
   const filteredProjects = filter === "All"
     ? projects
+    : filter === "GitHub"
+    ? projects.filter(project => project.source === 'github')
+    : filter === "Vercel"
+    ? projects.filter(project => project.source === 'vercel')
+    : filter === "Netlify"
+    ? projects.filter(project => project.source === 'netlify')
     : projects.filter(project => project.language === filter);
 
-  const ProjectCard = ({ project, index }: { project: GitHubRepo; index: number }) => {
+  const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
     const cardRef = useRef<HTMLDivElement>(null);
 
     return (
@@ -105,15 +203,17 @@ const Projects = () => {
               {project.name}
             </h3>
             <div className="flex space-x-3">
-              <a
-                href={project.html_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label={`View ${project.name} on GitHub`}
-              >
-                <Github size={18} />
-              </a>
+              {project.source === 'github' && (
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-white transition-colors"
+                  aria-label={`View ${project.name} on GitHub`}
+                >
+                  <Github size={18} />
+                </a>
+              )}
               {project.homepage && (
                 <a
                   href={project.homepage}
@@ -147,19 +247,22 @@ const Projects = () => {
 
           <div className="flex justify-between items-center">
             <span className="text-xs text-primary-400 font-medium px-3 py-1 bg-primary-400/10 rounded-full">
-              {project.language || "Various"}
+              {project.source === 'github' ? project.language || "Various" : 
+               project.source === 'vercel' ? "Vercel" : "Netlify"}
             </span>
 
-            <div className="flex space-x-4 text-gray-400 text-sm">
-              <div className="flex items-center space-x-1">
-                <Star size={14} />
-                <span>{project.stargazers_count}</span>
+            {project.source === 'github' && project.stats && (
+              <div className="flex space-x-4 text-gray-400 text-sm">
+                <div className="flex items-center space-x-1">
+                  <Star size={14} />
+                  <span>{project.stats.stars}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <GitFork size={14} />
+                  <span>{project.stats.forks}</span>
+                </div>
               </div>
-              <div className="flex items-center space-x-1">
-                <GitFork size={14} />
-                <span>{project.forks_count}</span>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -190,7 +293,7 @@ const Projects = () => {
           </h2>
 
           <p className="text-gray-300">
-            A collection of my latest projects from GitHub,
+            A collection of my latest projects from GitHub, Vercel, and Netlify,
             automatically updated as I create new ones.
           </p>
         </div>
