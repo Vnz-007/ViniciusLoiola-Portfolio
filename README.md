@@ -9,7 +9,7 @@
 
 ## 🌐 Deploys
 
-- 🔗 [Vercel](https://my-portfolio-no-code.vercel.app/)
+- 🔗 [Vercel](https://vinicius-loiola-portfolio.vercel.app)
 - 🔗 [Netlify](https://vinciusloiola-portfolio.netlify.app)
 
 ---
