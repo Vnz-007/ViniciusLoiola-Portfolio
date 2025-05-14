@@ -11,10 +11,20 @@ interface GitHubRepo {
   language: string;
   stargazers_count: number;
   forks_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface VercelProject {
+  id: string;
+  name: string;
+  framework: string;
+  url: string;
+  created: number;
 }
 
 const Projects = () => {
-  const [projects, setProjects] = useState<GitHubRepo[]>([]);
+  const [projects, setProjects] = useState<(GitHubRepo | VercelProject)[]>([]);
   const [filter, setFilter] = useState<string>("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,51 +32,36 @@ const Projects = () => {
 
   const sectionRef = useRef<HTMLElement>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const projectOrder = [
-    "portfolio",
-    "my-portifolio-nocode",
-    "spotify-clone",
-    "spotify-alura",
-    "flutter-techtastes",
-    "plataforma-de-agendamento",
-    "sistema-de-reembolso",
-    "rumble-nftwebsite",
-    "vl-convert",
-    "relogio-digital",
-    "epic-animes",
-    "devlinks-myprofile",
-    "previsao-do-tempo",
-  ];
-
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch(
-          "https://api.github.com/users/Vnz-007/repos?per_page=100"
+        setLoading(true);
+        
+        // Fetch GitHub projects
+        const githubResponse = await fetch(
+          "https://api.github.com/users/Vnz-007/repos?per_page=100&sort=created&direction=desc"
         );
-        if (!response.ok) throw new Error("Failed to fetch projects");
-        const data: GitHubRepo[] = await response.json();
+        if (!githubResponse.ok) throw new Error("Failed to fetch GitHub projects");
+        const githubData: GitHubRepo[] = await githubResponse.json();
 
-        // Sort projects according to the specified order
-        const sortedProjects = [...data].sort((a, b) => {
-          const indexA = projectOrder.indexOf(a.name);
-          const indexB = projectOrder.indexOf(b.name);
+        // Fetch Vercel projects (you'll need to implement this endpoint)
+        const vercelResponse = await fetch("/api/vercel-projects");
+        let vercelData: VercelProject[] = [];
+        if (vercelResponse.ok) {
+          vercelData = await vercelResponse.json();
+        }
 
-          // If both projects are in the order list
-          if (indexA !== -1 && indexB !== -1) {
-            return indexA - indexB;
-          }
-
-          // If only one project is in the order list
-          if (indexA !== -1) return -1;
-          if (indexB !== -1) return 1;
-
-          // If neither project is in the order list, maintain original order
-          return 0;
+        // Combine and sort projects by creation date
+        const allProjects = [
+          ...githubData,
+          ...vercelData,
+        ].sort((a, b) => {
+          const dateA = 'created_at' in a ? new Date(a.created_at).getTime() : a.created;
+          const dateB = 'created_at' in b ? new Date(b.created_at).getTime() : b.created;
+          return dateB - dateA;
         });
 
-        setProjects(sortedProjects);
+        setProjects(allProjects);
       } catch (err) {
         setError("Failed to load projects");
         console.error(err);
@@ -76,17 +71,21 @@ const Projects = () => {
     };
 
     fetchProjects();
-  }, [projectOrder]);
+    
+    // Set up polling to check for new projects every 5 minutes
+    const interval = setInterval(fetchProjects, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
-  // Listen for clicks on the Projects link in the header
   useEffect(() => {
     const handleProjectsClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const projectsLink = target.closest('a[href="#projects"]');
 
       if (projectsLink) {
-        setShowAnimation(false); // Reset animation
-        setTimeout(() => setShowAnimation(true), 50); // Trigger animation after a brief delay
+        setShowAnimation(false);
+        setTimeout(() => setShowAnimation(true), 50);
       }
     };
 
@@ -96,22 +95,36 @@ const Projects = () => {
 
   const categories = [
     "All",
-    ...new Set(projects.map((project) => project.language).filter(Boolean)),
+    ...new Set(
+      projects
+        .map((project) => {
+          if ('language' in project) {
+            return project.language;
+          }
+          return (project as VercelProject).framework;
+        })
+        .filter(Boolean)
+    ),
   ];
 
-  const filteredProjects =
-    filter === "All"
-      ? projects
-      : projects.filter((project) => project.language === filter);
+  const filteredProjects = filter === "All"
+    ? projects
+    : projects.filter((project) => {
+        if ('language' in project) {
+          return project.language === filter;
+        }
+        return (project as VercelProject).framework === filter;
+      });
 
   const ProjectCard = ({
     project,
     index,
   }: {
-    project: GitHubRepo;
+    project: GitHubRepo | VercelProject;
     index: number;
   }) => {
     const cardRef = useRef<HTMLDivElement>(null);
+    const isGithubProject = 'html_url' in project;
 
     return (
       <div
@@ -131,25 +144,27 @@ const Projects = () => {
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-xl font-semibold group-hover:text-primary-400 transition-colors">
-              {project.name}
+              {isGithubProject ? (project as GitHubRepo).name : (project as VercelProject).name}
             </h3>
             <div className="flex space-x-3">
-              <a
-                href={project.html_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label={`View ${project.name} on GitHub`}
-              >
-                <Github size={18} />
-              </a>
-              {project.homepage && (
+              {isGithubProject && (
                 <a
-                  href={project.homepage}
+                  href={(project as GitHubRepo).html_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-white transition-colors"
+                  aria-label={`View ${(project as GitHubRepo).name} on GitHub`}
+                >
+                  <Github size={18} />
+                </a>
+              )}
+              {(isGithubProject ? (project as GitHubRepo).homepage : (project as VercelProject).url) && (
+                <a
+                  href={isGithubProject ? (project as GitHubRepo).homepage : (project as VercelProject).url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-primary-400 transition-colors"
-                  aria-label={`View live demo of ${project.name}`}
+                  aria-label={`View live demo of ${isGithubProject ? (project as GitHubRepo).name : (project as VercelProject).name}`}
                 >
                   <ArrowUpRight size={18} />
                 </a>
@@ -157,39 +172,54 @@ const Projects = () => {
             </div>
           </div>
 
-          <p className="text-gray-300 text-sm mb-4 line-clamp-2">
-            {project.description || "No description available"}
-          </p>
+          {isGithubProject && (
+            <>
+              <p className="text-gray-300 text-sm mb-4 line-clamp-2">
+                {(project as GitHubRepo).description || "No description available"}
+              </p>
 
-          {project.topics && project.topics.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {project.topics.slice(0, 3).map((topic, i) => (
-                <span
-                  key={i}
-                  className="text-xs bg-dark-700/80 text-primary-400 px-2 py-1 rounded-full"
-                >
-                  {topic}
+              {(project as GitHubRepo).topics && (project as GitHubRepo).topics.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {(project as GitHubRepo).topics.slice(0, 3).map((topic, i) => (
+                    <span
+                      key={i}
+                      className="text-xs bg-dark-700/80 text-primary-400 px-2 py-1 rounded-full"
+                    >
+                      {topic}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-primary-400 font-medium px-3 py-1 bg-primary-400/10 rounded-full">
+                  {(project as GitHubRepo).language || "Various"}
                 </span>
-              ))}
-            </div>
+
+                <div className="flex space-x-4 text-gray-400 text-sm">
+                  <div className="flex items-center space-x-1">
+                    <Star size={14} />
+                    <span>{(project as GitHubRepo).stargazers_count}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <GitFork size={14} />
+                    <span>{(project as GitHubRepo).forks_count}</span>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
 
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-primary-400 font-medium px-3 py-1 bg-primary-400/10 rounded-full">
-              {project.language || "Various"}
-            </span>
-
-            <div className="flex space-x-4 text-gray-400 text-sm">
-              <div className="flex items-center space-x-1">
-                <Star size={14} />
-                <span>{project.stargazers_count}</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <GitFork size={14} />
-                <span>{project.forks_count}</span>
-              </div>
+          {!isGithubProject && (
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-xs text-primary-400 font-medium px-3 py-1 bg-primary-400/10 rounded-full">
+                {(project as VercelProject).framework}
+              </span>
+              <span className="text-xs text-gray-400">
+                Deployed on Vercel
+              </span>
             </div>
-          </div>
+          )}
         </div>
       </div>
     );
@@ -218,7 +248,10 @@ const Projects = () => {
             Featured <span className="text-primary-400">Works</span>
           </h2>
 
-          <p className="text-gray-300"></p>
+          <p className="text-gray-300">
+            A collection of my latest projects from GitHub and Vercel,
+            automatically updated as I create new ones.
+          </p>
         </div>
 
         {error ? (
@@ -260,7 +293,11 @@ const Projects = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProjects.map((project, index) => (
-                <ProjectCard key={project.id} project={project} index={index} />
+                <ProjectCard 
+                  key={'id' in project ? project.id : project.name} 
+                  project={project} 
+                  index={index} 
+                />
               ))}
             </div>
           </>
