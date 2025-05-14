@@ -15,26 +15,6 @@ interface GitHubRepo {
   updated_at: string;
 }
 
-interface VercelProject {
-  id: string;
-  name: string;
-  framework: string;
-  latestDeployments: Array<{
-    url: string;
-    meta: { githubCommitRef: string };
-  }>;
-}
-
-interface NetlifyProject {
-  id: string;
-  name: string;
-  url: string;
-  screenshot_url: string;
-  published_deploy: {
-    commit_ref: string;
-  };
-}
-
 interface Project {
   id: string;
   name: string;
@@ -47,7 +27,7 @@ interface Project {
     stars?: number;
     forks?: number;
   };
-  source: 'github' | 'vercel' | 'netlify';
+  source: 'github';
   createdAt?: string;
   updatedAt?: string;
 }
@@ -78,22 +58,6 @@ const Projects = () => {
     updatedAt: repo.updated_at,
   });
 
-  const transformVercelProject = (project: VercelProject): Project => ({
-    id: project.id,
-    name: project.name,
-    url: project.latestDeployments[0]?.url || '',
-    language: project.framework,
-    source: 'vercel',
-  });
-
-  const transformNetlifyProject = (project: NetlifyProject): Project => ({
-    id: project.id,
-    name: project.name,
-    url: project.url,
-    homepage: project.url,
-    source: 'netlify',
-  });
-
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -107,24 +71,7 @@ const Projects = () => {
         const githubData: GitHubRepo[] = await githubResponse.json();
         const githubProjects = githubData.map(transformGithubProject);
 
-        // Fetch Vercel projects
-        const vercelResponse = await fetch('/api/vercel-projects');
-        let vercelProjects: Project[] = [];
-        if (vercelResponse.ok) {
-          const vercelData: VercelProject[] = await vercelResponse.json();
-          vercelProjects = vercelData.map(transformVercelProject);
-        }
-
-        // Fetch Netlify projects
-        const netlifyResponse = await fetch('/api/netlify-projects');
-        let netlifyProjects: Project[] = [];
-        if (netlifyResponse.ok) {
-          const netlifyData: NetlifyProject[] = await netlifyResponse.json();
-          netlifyProjects = netlifyData.map(transformNetlifyProject);
-        }
-
-        // Combine all projects
-        setProjects([...githubProjects, ...vercelProjects, ...netlifyProjects]);
+        setProjects(githubProjects);
       } catch (err) {
         setError("Failed to load projects");
         console.error(err);
@@ -159,8 +106,6 @@ const Projects = () => {
   const categories = [
     "All",
     "GitHub",
-    "Vercel",
-    "Netlify",
     ...new Set(
       projects
         .filter(project => project.source === 'github')
@@ -173,10 +118,6 @@ const Projects = () => {
     ? projects
     : filter === "GitHub"
     ? projects.filter(project => project.source === 'github')
-    : filter === "Vercel"
-    ? projects.filter(project => project.source === 'vercel')
-    : filter === "Netlify"
-    ? projects.filter(project => project.source === 'netlify')
     : projects.filter(project => project.language === filter);
 
   const ProjectCard = ({ project, index }: { project: Project; index: number }) => {
@@ -203,17 +144,15 @@ const Projects = () => {
               {project.name}
             </h3>
             <div className="flex space-x-3">
-              {project.source === 'github' && (
-                <a
-                  href={project.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-white transition-colors"
-                  aria-label={`View ${project.name} on GitHub`}
-                >
-                  <Github size={18} />
-                </a>
-              )}
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label={`View ${project.name} on GitHub`}
+              >
+                <Github size={18} />
+              </a>
               {project.homepage && (
                 <a
                   href={project.homepage}
@@ -247,11 +186,10 @@ const Projects = () => {
 
           <div className="flex justify-between items-center">
             <span className="text-xs text-primary-400 font-medium px-3 py-1 bg-primary-400/10 rounded-full">
-              {project.source === 'github' ? project.language || "Various" : 
-               project.source === 'vercel' ? "Vercel" : "Netlify"}
+              {project.language || "Various"}
             </span>
 
-            {project.source === 'github' && project.stats && (
+            {project.stats && (
               <div className="flex space-x-4 text-gray-400 text-sm">
                 <div className="flex items-center space-x-1">
                   <Star size={14} />
@@ -293,8 +231,7 @@ const Projects = () => {
           </h2>
 
           <p className="text-gray-300">
-            A collection of my latest projects from GitHub, Vercel, and Netlify,
-            automatically updated as I create new ones.
+            A collection of my latest projects from GitHub, automatically updated as I create new ones.
           </p>
         </div>
 
