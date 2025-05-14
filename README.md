@@ -1,6 +1,9 @@
 # 🚀 Vinícius Loiola – Portfólio Profissional
 
-✨ Bem-vinda ao repositório do meu portfólio definitivo – um projeto que combina design, desenvolvimento e inteligência artificial para refletir minha trajetória como desenvolvedora full-stack.
+✨ Bem-vinda ao repositório do meu portfólio definitivo – um projeto que combina design, desenvolvimento e inteligência artificial para refletir minha trajetória como desenvolvedor full-stack.
+
+![Portfólio](https://github.com/user-attachments/assets/b6e75aa3-a398-42dd-bd28-170c62d71cf7)
+
 
 ---
 
