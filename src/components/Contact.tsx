@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { MapPin, Mail, Phone, Send } from "lucide-react";
 import { useInView } from "../hooks/useInView";
+import emailjs from "@emailjs/browser";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -10,8 +11,10 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const sectionRef = useRef<HTMLElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const isInView = useInView(sectionRef, { threshold: 0.1 });
 
   const handleChange = (
@@ -19,21 +22,33 @@ const Contact = () => {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (error) setError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsSubmitting(true);
 
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await emailjs.sendForm(
+        "service_lkqrcfu",
+        "template_s55xrpo",
+        formRef.current!,
+        "PpO-oTMPvZY8QLWK3"
+      );
+
       setSuccess(true);
       setFormData({ name: "", email: "", message: "" });
 
       // Reset success message after 3 seconds
       setTimeout(() => setSuccess(false), 3000);
-    }, 1500);
+    } catch (err) {
+      console.error("Email error:", err);
+      setError("Failed to send message. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -83,7 +98,9 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-medium mb-1">Location</h4>
-                    <p className="text-gray-300 text-sm">Recife, Pernambuco</p>
+                    <p className="text-gray-300 text-sm">
+                      New York City, United States
+                    </p>
                   </div>
                 </div>
 
@@ -94,10 +111,10 @@ const Contact = () => {
                   <div>
                     <h4 className="font-medium mb-1">Email</h4>
                     <a
-                      href="mailto:hello@example.com"
+                      href="mailto:viniciusloiolajg@gmail.com"
                       className="text-gray-300 text-sm hover:text-primary-400 transition-colors"
                     >
-                      viniciusloiolaJG@gmail.com
+                      viniciusloiolajg@gmail.com
                     </a>
                   </div>
                 </div>
@@ -112,7 +129,7 @@ const Contact = () => {
                       href="tel:+1234567890"
                       className="text-gray-300 text-sm hover:text-primary-400 transition-colors"
                     >
-                      +55 (75) 9 3300-9996
+                      +1 (234) 567-890
                     </a>
                   </div>
                 </div>
@@ -230,7 +247,11 @@ const Contact = () => {
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form
+                  ref={formRef}
+                  onSubmit={handleSubmit}
+                  className="space-y-5"
+                >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label
@@ -247,7 +268,7 @@ const Contact = () => {
                         onChange={handleChange}
                         required
                         className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all"
-                        placeholder="John Doe"
+                        placeholder="Vinícius Loiola"
                       />
                     </div>
 
@@ -265,8 +286,10 @@ const Contact = () => {
                         value={formData.email}
                         onChange={handleChange}
                         required
+                        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                        title="Please enter a valid email address"
                         className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all"
-                        placeholder="johndoe@example.com"
+                        placeholder="vlportfolio@example.com"
                       />
                     </div>
                   </div>
@@ -289,6 +312,12 @@ const Contact = () => {
                       placeholder="Hello, I would like to discuss a project..."
                     ></textarea>
                   </div>
+
+                  {error && (
+                    <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4 text-center">
+                      <p className="text-red-400 font-medium">{error}</p>
+                    </div>
+                  )}
 
                   <button
                     type="submit"
