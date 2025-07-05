@@ -74,7 +74,7 @@ const Skills = () => {
     { name: "HTML", level: 95, icon: "🔧" },
     { name: "CSS", level: 95, icon: "🎨" },
     { name: "JavaScript", level: 20, icon: "JS" },
-    { name: "TypeScript", level: 0, icon: "TS" },
+    { name: "TypeScript", level: 10, icon: "TS" },
     { name: "React.js", level: 5, icon: "⚛️" },
     { name: "Next.js", level: 0, icon: "▲" },
   ];
@@ -87,7 +87,7 @@ const Skills = () => {
   ];
 
   const designSkills = [
-    { name: "UI/UX Design", level: 92, icon: "🎯" },
+    { name: "UX/UI Design", level: 92, icon: "🎯" },
     { name: "Figma", level: 88, icon: "🖌️" },
     { name: "Responsive Design", level: 95, icon: "📱" },
     { name: "Animation", level: 80, icon: "✨" },
