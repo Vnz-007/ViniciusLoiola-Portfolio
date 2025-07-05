@@ -1,6 +1,6 @@
 # 🚀 Vinícius Loiola – Portfólio Profissional
 
-✨ Bem-vinda ao repositório do meu portfólio definitivo – um projeto que combina design, desenvolvimento e inteligência artificial para refletir minha trajetória como desenvolvedor full-stack.
+✨ Bem-vindo ao repositório do meu portfólio definitivo – um projeto que combina design, desenvolvimento e inteligência artificial para refletir minha trajetória como desenvolvedor full-stack.
 
 ![Portfólio](https://github.com/user-attachments/assets/b6e75aa3-a398-42dd-bd28-170c62d71cf7)
 
@@ -48,7 +48,7 @@ Embora a proposta inicial fosse explorar soluções NoCode e LowCode combinadas 
 
 ## 🎯 Objetivo
 
-A criação deste portfólio surgiu da necessidade de organizar e apresentar meus projetos de forma clara, moderna e funcional. Mais do que um repositório visual, ele representa um espaço onde design centrado na usuária, automação inteligente e código limpo se encontram.
+A criação deste portfólio surgiu da necessidade de organizar e apresentar meus projetos de forma clara, moderna e funcional. Mais do que um repositório visual, ele representa um espaço onde o design centrado na usuário, automação inteligente e código limpo se encontram.
 
 ---
 
