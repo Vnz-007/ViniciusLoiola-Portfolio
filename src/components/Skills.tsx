@@ -99,7 +99,7 @@ const Skills = () => {
     {
       name: "Git/GitHub",
       level: 83,
-      icon: "🔄😺",
+      icon: "🔄",
     },
     {
       name: "Vercel",
