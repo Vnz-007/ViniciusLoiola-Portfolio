@@ -83,7 +83,7 @@ const Skills = () => {
 
   const backendSkills = [
     { name: "Node.js", level: 5, icon: "🟢" },
-    { name: "SQL", level: 0, icon: "🔋" },
+    { name: "SQL", level: 0, icon: "🛢" },
     { name: "GraphQL", level: 0, icon: "🛑" },
     { name: "SEO", level: 77, icon: "🔍" },
   ];
