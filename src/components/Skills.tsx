@@ -112,7 +112,7 @@ const Skills = () => {
       icon: "N",
     },
     {
-      name: "BoltIA",
+      name: "Bolt.new",
       level: 77,
       icon: "B",
     },
